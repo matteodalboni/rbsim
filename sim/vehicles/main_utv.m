@@ -1,3 +1,4 @@
+% The UTV is modeled as a single rigid body. Track dynamics are neglected.
 clear; close all; clc;
 addpath('../')
 
@@ -65,6 +66,5 @@ while 1
         view(getappdata(hfig, 'az'), getappdata(hfig, 'el'))
         title(sprintf("wl:%+5d rad/s | wr:%+5d rad/s",wheel_l.w,wheel_r.w))
         drawnow;
-        %exportgraphics(gcf,'utv.gif','Append',true);
     end
 end

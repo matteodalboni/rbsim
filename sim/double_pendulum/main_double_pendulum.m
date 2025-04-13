@@ -54,7 +54,7 @@ for k = 1:length(t)
         ylim([-2.5,2.5])
         zlim([-2.5,1])
         drawnow;
-        exportgraphics(gcf,gif_name,'Append',true);
+        %exportgraphics(gcf,gif_name,'Append',true);
     end
 end
 
