@@ -13,11 +13,14 @@ beam2 = RigidBody(beam2_mass, get_box_inertia(beam2_mass, beam_size));
 beam2.setPosition([1, 0.5, 0]);
 beam2.setRotation(pi/2, [0, 0, 1]);
 
+%% Uncomment to save the animation in a GIF
+% gif_name = "gif/double_pendulum_"...
+%     + string(datetime('now','Format','d_MMM_y_HH_mm_ss')) + ".gif";
+
 %% Main loop
-dt = 1e-3; % consider decreasing with unfavourable mass and inertia ratios
+dt = 1e-4;
 t = 0:dt:10;
-gif_name = "gif/double_pendulum_"...
-    + string(datetime('now','Format','d_MMM_y_HH_mm_ss')) + ".gif";
+lambda = zeros(6,1);
 figure('Position', [10 10 900 600])
 for k = 1:length(t)
     % Set gravity
@@ -27,8 +30,7 @@ for k = 1:length(t)
     beam1.update(dt);
     beam2.update(dt);
     % Solve the constraints
-    lambda = zeros(6,1);
-    for iter = 1:20 % consider increasing with unfavourable mass and inertia ratios
+    for iter = 1:2
         lambda(1) = beam1.fixPoint([-0.5,0,0], [0,0,0], 0, lambda(1), dt);
         lambda(2) = beam1.linkPoints(beam2, [0.5,0,0], [-0.5,0,0], 0, lambda(2), dt);
         lambda(3) = beam1.linkAxes(beam2, [0,0,1], [0,0,1], 0, lambda(3), dt);
@@ -37,8 +39,8 @@ for k = 1:length(t)
         %lambda(6) = beam1.fixAxis([1,0,0], [1,0,0], 0, lambda(6), dt);
     end
     % Show animation
-    if (~mod(k, 100))
-        clf;
+    if (~mod(k, 500))
+        clf
         show_box(beam1.x, beam1.R, beam_size, 'r')
         show_box(beam2.x, beam2.R, beam_size, 'g')
         hold on
@@ -53,8 +55,10 @@ for k = 1:length(t)
         xlim([-2.5,2.5])
         ylim([-2.5,2.5])
         zlim([-2.5,1])
-        drawnow;
-        %exportgraphics(gcf,gif_name,'Append',true);
+        drawnow
+        if exist('gif_name','var')
+            exportgraphics(gcf,gif_name,'Append',true);
+        end
     end
 end
 
