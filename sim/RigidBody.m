@@ -83,10 +83,7 @@ classdef RigidBody < handle
             r2 = rb2.R*xb2(:);
             g = rb1.x + r1 - rb2.x - r2;
             c = norm(g);
-            if c < 1e-12
-                return
-            end
-            n = g / c;
+            n = g / max(eps,c);
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             I_inv2 = rb2.R * rb2.Ib_inv * rb2.R';
             c1 = cross(r1,n);
@@ -155,10 +152,7 @@ classdef RigidBody < handle
             r1 = rb1.R*xb1(:);
             g = rb1.x + r1 - x2(:);
             c = norm(g);
-            if c < 1e-12
-                return
-            end
-            n = g / c;
+            n = g / max(eps,c);
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             c1 = cross(r1,n);
             w1 = 1/rb1.m + c1'*I_inv1*c1;
