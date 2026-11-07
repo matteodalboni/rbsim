@@ -7,7 +7,7 @@ classdef RigidBody < handle
         q = [1;0;0;0] % rotation quaternion
         P = zeros(3,1) % linear momentum
         L = zeros(3,1) % angular momentum
-        R = zeros(3) % rotation matrix
+        R = eye(3) % rotation matrix
         v = zeros(3,1) % velocity of the center of mass
         w = zeros(3,1) % angular velocity
         F = zeros(3,1) % total force
@@ -27,6 +27,7 @@ classdef RigidBody < handle
 
         function setVelocity(rb, v)
             rb.v = v(:);
+            rb.P = rb.m*rb.v;
         end
 
         function setRotation(rb, alpha, direction)
@@ -78,18 +79,22 @@ classdef RigidBody < handle
             % Link the points xb1 and xb2 to each other. The points are
             % expressed in the body reference frames and belong to this
             % rigid body (rb1) and to the rigid body rb2, respectively.
-            r1 = rb1.x + rb1.R*xb1(:);
-            r2 = rb2.x + rb2.R*xb2(:);
-            g = r1 - r2;
+            r1 = rb1.R*xb1(:);
+            r2 = rb2.R*xb2(:);
+            g = rb1.x + r1 - rb2.x - r2;
             c = norm(g);
-            n = g / max(eps,c);
+            if c < 1e-12
+                return
+            end
+            n = g / c;
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             I_inv2 = rb2.R * rb2.Ib_inv * rb2.R';
             c1 = cross(r1,n);
             c2 = cross(r2,n);
             w1 = 1/rb1.m + c1'*I_inv1*c1;
             w2 = 1/rb2.m + c2'*I_inv2*c2;
-            dlambda = -(c + alpha/dt^2*lambda)/(w1 + w2 + alpha/dt^2 + eps);
+            alpha_tilde = alpha/dt^2;
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
@@ -103,8 +108,8 @@ classdef RigidBody < handle
             f = dlambda*n/dt^2;
             rb1.P = rb1.P + f*dt;
             rb2.P = rb2.P - f*dt;
-            rb1.L = rb1.L + cross(r1 - rb1.x, f)*dt;
-            rb2.L = rb2.L - cross(r2 - rb2.x, f)*dt;
+            rb1.L = rb1.L + cross(r1,f)*dt;
+            rb2.L = rb2.L - cross(r2,f)*dt;
             rb1.v = rb1.P / rb1.m;
             rb2.v = rb2.P / rb2.m;
             rb1.w = rb1.R * rb1.Ib_inv * rb1.R' * rb1.L;
@@ -126,7 +131,8 @@ classdef RigidBody < handle
             I_inv2 = rb2.R * rb2.Ib_inv * rb2.R';
             w1 = n'*I_inv1*n;
             w2 = n'*I_inv2*n;
-            dlambda = -(c + alpha/dt^2*lambda)/(w1 + w2 + alpha/dt^2 + eps);
+            alpha_tilde = alpha/dt^2;
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*p]',rb1.q')';
@@ -146,14 +152,18 @@ classdef RigidBody < handle
             % Fix the point xb1 to the point x2. xb1 is expressed in the
             % body reference frame and belongs to this rigid body (rb1),
             % whereas x2 is expressed in the world reference frame.
-            r1 = rb1.x + rb1.R*xb1(:);
-            g = r1 - x2(:);
+            r1 = rb1.R*xb1(:);
+            g = rb1.x + r1 - x2(:);
             c = norm(g);
-            n = g / max(eps,c);
+            if c < 1e-12
+                return
+            end
+            n = g / c;
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             c1 = cross(r1,n);
             w1 = 1/rb1.m + c1'*I_inv1*c1;
-            dlambda = -(c + alpha/dt^2*lambda)/(w1 + alpha/dt^2 + eps);
+            alpha_tilde = alpha/dt^2;
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
@@ -162,7 +172,7 @@ classdef RigidBody < handle
             rb1.R = quat2rotm(rb1.q');
             f = dlambda*n/dt^2;
             rb1.P = rb1.P + f*dt;
-            rb1.L = rb1.L + cross(r1 - rb1.x, f)*dt;
+            rb1.L = rb1.L + cross(r1,f)*dt;
             rb1.v = rb1.P / rb1.m;
             rb1.w = rb1.R * rb1.Ib_inv * rb1.R' * rb1.L;
         end
@@ -179,7 +189,8 @@ classdef RigidBody < handle
             n = g / max(eps,c);
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             w1 = n'*I_inv1*n;
-            dlambda = -(c + alpha/dt^2*lambda)/(w1 + alpha/dt^2 + eps);
+            alpha_tilde = alpha/dt^2;
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*p]',rb1.q')';

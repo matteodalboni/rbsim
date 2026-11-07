@@ -18,7 +18,7 @@ beam2.setRotation(pi/2, [0, 0, 1]);
 %     + string(datetime('now','Format','d_MMM_y_HH_mm_ss')) + ".gif";
 
 %% Main loop
-dt = 1e-4;
+dt = 1e-3;
 t = 0:dt:10;
 figure('Position', [10 10 900 600])
 for k = 1:length(t)
@@ -31,15 +31,15 @@ for k = 1:length(t)
     % Solve the constraints
     lambda = zeros(6,1);
     for iter = 1:2
-        lambda(1) = beam1.fixPoint([-0.5,0,0], [0,0,0], 1e-7, lambda(1), dt);
-        lambda(2) = beam1.linkPoints(beam2, [0.5,0,0], [-0.5,0,0], 1e-7, lambda(2), dt);
+        lambda(1) = beam1.fixPoint([-0.5,0,0], [0,0,0], 0, lambda(1), dt);
+        lambda(2) = beam1.linkPoints(beam2, [0.5,0,0], [-0.5,0,0], 0, lambda(2), dt);
         lambda(3) = beam1.linkAxes(beam2, [0,0,1], [0,0,1], 0, lambda(3), dt);
         %lambda(4) = beam1.linkAxes(beam2, [1,0,0], [0,-1,0], 0, lambda(4), dt);
         %lambda(5) = beam2.fixAxis([1,0,0], [0,1,0], 0, lambda(5), dt);
         %lambda(6) = beam1.fixAxis([1,0,0], [1,0,0], 0, lambda(6), dt);
     end
     % Show animation
-    if (~mod(k, 500))
+    if (~mod(k, 100))
         clf
         show_box(beam1.x, beam1.R, beam_size, 'r')
         show_box(beam2.x, beam2.R, beam_size, 'g')
