@@ -20,7 +20,6 @@ beam2.setRotation(pi/2, [0, 0, 1]);
 %% Main loop
 dt = 1e-4;
 t = 0:dt:10;
-lambda = zeros(6,1);
 figure('Position', [10 10 900 600])
 for k = 1:length(t)
     % Set gravity
@@ -30,9 +29,10 @@ for k = 1:length(t)
     beam1.update(dt);
     beam2.update(dt);
     % Solve the constraints
+    lambda = zeros(6,1);
     for iter = 1:2
-        lambda(1) = beam1.fixPoint([-0.5,0,0], [0,0,0], 0, lambda(1), dt);
-        lambda(2) = beam1.linkPoints(beam2, [0.5,0,0], [-0.5,0,0], 0, lambda(2), dt);
+        lambda(1) = beam1.fixPoint([-0.5,0,0], [0,0,0], 1e-7, lambda(1), dt);
+        lambda(2) = beam1.linkPoints(beam2, [0.5,0,0], [-0.5,0,0], 1e-7, lambda(2), dt);
         lambda(3) = beam1.linkAxes(beam2, [0,0,1], [0,0,1], 0, lambda(3), dt);
         %lambda(4) = beam1.linkAxes(beam2, [1,0,0], [0,-1,0], 0, lambda(4), dt);
         %lambda(5) = beam2.fixAxis([1,0,0], [0,1,0], 0, lambda(5), dt);
@@ -91,9 +91,9 @@ function show_box(x, R, siz, col)
     patch('vertices', coord, 'faces', idx, ...
         'facecolor', col, 'facealpha', 1, 'EdgeColor', 'none');
     hold on
-    quiver3(x(1),x(2),x(3),R(1,1),R(2,1),R(3,1),'r','LineWidth',2)
-    quiver3(x(1),x(2),x(3),R(1,2),R(2,2),R(3,2),'g','LineWidth',2)
-    quiver3(x(1),x(2),x(3),R(1,3),R(2,3),R(3,3),'b','LineWidth',2)
+    % quiver3(x(1),x(2),x(3),R(1,1),R(2,1),R(3,1),'r','LineWidth',2)
+    % quiver3(x(1),x(2),x(3),R(1,2),R(2,2),R(3,2),'g','LineWidth',2)
+    % quiver3(x(1),x(2),x(3),R(1,3),R(2,3),R(3,3),'b','LineWidth',2)
     light("Style","local","Position",[-10 -50 100]);
     xlabel('x [m]'); ylabel('y [m]'); zlabel('z [m]');
     box on; grid on; axis equal

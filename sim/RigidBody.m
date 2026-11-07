@@ -74,7 +74,7 @@ classdef RigidBody < handle
             rb.T = zeros(3,1);
         end
 
-        function lambda = linkPoints(rb1, rb2, xb1, xb2, compl, lambda, dt)
+        function lambda = linkPoints(rb1, rb2, xb1, xb2, alpha, lambda, dt)
             % Link the points xb1 and xb2 to each other. The points are
             % expressed in the body reference frames and belong to this
             % rigid body (rb1) and to the rigid body rb2, respectively.
@@ -82,14 +82,14 @@ classdef RigidBody < handle
             r2 = rb2.x + rb2.R*xb2(:);
             g = r1 - r2;
             c = norm(g);
-            n = g; % / max(eps,c);
+            n = g / max(eps,c);
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             I_inv2 = rb2.R * rb2.Ib_inv * rb2.R';
             c1 = cross(r1,n);
             c2 = cross(r2,n);
             w1 = 1/rb1.m + c1'*I_inv1*c1;
             w2 = 1/rb2.m + c2'*I_inv2*c2;
-            dlambda = -(c + compl/dt^2*lambda)/(w1 + w2 + compl/dt^2);
+            dlambda = -(c + alpha/dt^2*lambda)/(w1 + w2 + alpha/dt^2 + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
@@ -111,7 +111,7 @@ classdef RigidBody < handle
             rb2.w = rb2.R * rb2.Ib_inv * rb2.R' * rb2.L;
         end
 
-        function lambda = linkAxes(rb1, rb2, axb1, axb2, compl, lambda, dt)
+        function lambda = linkAxes(rb1, rb2, axb1, axb2, alpha, lambda, dt)
             % Link the axes axb1 and axb2 to each other. The axes are
             % expressed in the body reference frames and belong to this
             % rigid body (rb1) and to the rigid body rb2, respectively.
@@ -126,7 +126,7 @@ classdef RigidBody < handle
             I_inv2 = rb2.R * rb2.Ib_inv * rb2.R';
             w1 = n'*I_inv1*n;
             w2 = n'*I_inv2*n;
-            dlambda = -(c + compl/dt^2*lambda)/(w1 + w2 + compl/dt^2 + eps);
+            dlambda = -(c + alpha/dt^2*lambda)/(w1 + w2 + alpha/dt^2 + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*p]',rb1.q')';
@@ -142,18 +142,18 @@ classdef RigidBody < handle
             rb2.w = rb2.R * rb2.Ib_inv * rb2.R' * rb2.L;
         end
 
-        function lambda = fixPoint(rb1, xb1, x2, compl, lambda, dt)
+        function lambda = fixPoint(rb1, xb1, x2, alpha, lambda, dt)
             % Fix the point xb1 to the point x2. xb1 is expressed in the
             % body reference frame and belongs to this rigid body (rb1),
             % whereas x2 is expressed in the world reference frame.
             r1 = rb1.x + rb1.R*xb1(:);
             g = r1 - x2(:);
             c = norm(g);
-            n = g; % / max(eps,c);
+            n = g / max(eps,c);
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             c1 = cross(r1,n);
             w1 = 1/rb1.m + c1'*I_inv1*c1;
-            dlambda = -(c + compl/dt^2*lambda)/(w1 + compl/dt^2);
+            dlambda = -(c + alpha/dt^2*lambda)/(w1 + alpha/dt^2 + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
@@ -167,7 +167,7 @@ classdef RigidBody < handle
             rb1.w = rb1.R * rb1.Ib_inv * rb1.R' * rb1.L;
         end
 
-        function lambda = fixAxis(rb1, axb1, ax2, compl, lambda, dt)
+        function lambda = fixAxis(rb1, axb1, ax2, alpha, lambda, dt)
             % Fix the axis axb1 to the axis ax2. axb1 is expressed in the
             % body reference frame and belongs to this rigid body (rb1),
             % whereas ax2 is expressed in the world reference frame.
@@ -179,7 +179,7 @@ classdef RigidBody < handle
             n = g / max(eps,c);
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             w1 = n'*I_inv1*n;
-            dlambda = -(c + compl/dt^2*lambda)/(w1 + compl/dt^2 + eps);
+            dlambda = -(c + alpha/dt^2*lambda)/(w1 + alpha/dt^2 + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*p]',rb1.q')';
