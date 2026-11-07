@@ -41,8 +41,8 @@ for k = 1:length(t)
     % Show animation
     if (~mod(k, 100))
         clf
-        show_box(beam1.x, beam1.R, beam_size, 'r')
-        show_box(beam2.x, beam2.R, beam_size, 'g')
+        show_box(beam1.x, beam1.R, beam_size, 'r', 0)
+        show_box(beam2.x, beam2.R, beam_size, 'g', 0)
         hold on
         plot3(0,0,0,'k.','MarkerSize',10)
         x = [beam1.x + beam1.R*[-0.5;0;0], ...
@@ -60,41 +60,4 @@ for k = 1:length(t)
             exportgraphics(gcf,gif_name,'Append',true);
         end
     end
-end
-
-%% Functions
-function inertia = get_box_inertia(box_mass, box_size)
-    inertia = diag(box_mass/12*[
-        box_size(2)^2 + box_size(3)^2
-        box_size(1)^2 + box_size(3)^2
-        box_size(1)^2 + box_size(2)^2]);
-end
-
-function show_box(x, R, siz, col)
-    coord = [
-        -1 -1 -1;
-        +1 -1 -1;
-        +1 +1 -1;
-        -1 +1 -1;
-        -1 -1 +1;
-        +1 -1 +1;
-        +1 +1 +1;
-        -1 +1 +1] .* siz(:)'*0.5;
-    coord = (R*coord')' + x(:)';
-    idx = [
-        4 8 5 1 4
-        1 5 6 2 1
-        2 6 7 3 2
-        3 7 8 4 3
-        5 8 7 6 5
-        1 4 3 2 1];
-    patch('vertices', coord, 'faces', idx, ...
-        'facecolor', col, 'facealpha', 1, 'EdgeColor', 'none');
-    hold on
-    % quiver3(x(1),x(2),x(3),R(1,1),R(2,1),R(3,1),'r','LineWidth',2)
-    % quiver3(x(1),x(2),x(3),R(1,2),R(2,2),R(3,2),'g','LineWidth',2)
-    % quiver3(x(1),x(2),x(3),R(1,3),R(2,3),R(3,3),'b','LineWidth',2)
-    light("Style","local","Position",[-10 -50 100]);
-    xlabel('x [m]'); ylabel('y [m]'); zlabel('z [m]');
-    box on; grid on; axis equal
 end

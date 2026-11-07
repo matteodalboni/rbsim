@@ -33,7 +33,7 @@ classdef RigidBody < handle
         function setRotation(rb, alpha, direction)
             rb.q = [cos(0.5*alpha); sin(0.5*alpha)*direction(:)];
             rb.q = rb.q / norm(rb.q);
-            rb.R = quat2rotm(rb.q');
+            rb.R = quat2rotm_(rb.q');
         end
 
         function vq = getVelocity(rb, xq)
@@ -67,7 +67,7 @@ classdef RigidBody < handle
             rb.setStates(y + dt*(s1 + 2*s2 + 2*s3 + s4)/6);
             % Update of the auxiliary variables
             rb.q = rb.q / norm(rb.q);
-            rb.R = quat2rotm(rb.q');
+            rb.R = quat2rotm_(rb.q');
             rb.v = rb.P / rb.m;
             rb.w = rb.R * rb.Ib_inv * rb.R' * rb.L;
             % Reset of forces and torques
@@ -99,12 +99,12 @@ classdef RigidBody < handle
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
             rb2.x = rb2.x - p/rb2.m;
-            rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*cross(r1,p)]',rb1.q')';
-            rb2.q = rb2.q - 0.5*quatmultiply([0;I_inv2*cross(r2,p)]',rb2.q')';
+            rb1.q = rb1.q + 0.5*quatmultiply_([0;I_inv1*cross(r1,p)]',rb1.q')';
+            rb2.q = rb2.q - 0.5*quatmultiply_([0;I_inv2*cross(r2,p)]',rb2.q')';
             rb1.q = rb1.q / norm(rb1.q);
             rb2.q = rb2.q / norm(rb2.q);
-            rb1.R = quat2rotm(rb1.q');
-            rb2.R = quat2rotm(rb2.q');
+            rb1.R = quat2rotm_(rb1.q');
+            rb2.R = quat2rotm_(rb2.q');
             f = dlambda*n/dt^2;
             rb1.P = rb1.P + f*dt;
             rb2.P = rb2.P - f*dt;
@@ -135,12 +135,12 @@ classdef RigidBody < handle
             dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
-            rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*p]',rb1.q')';
-            rb2.q = rb2.q - 0.5*quatmultiply([0;I_inv2*p]',rb2.q')';
+            rb1.q = rb1.q + 0.5*quatmultiply_([0;I_inv1*p]',rb1.q')';
+            rb2.q = rb2.q - 0.5*quatmultiply_([0;I_inv2*p]',rb2.q')';
             rb1.q = rb1.q / norm(rb1.q);
             rb2.q = rb2.q / norm(rb2.q);
-            rb1.R = quat2rotm(rb1.q');
-            rb2.R = quat2rotm(rb2.q');
+            rb1.R = quat2rotm_(rb1.q');
+            rb2.R = quat2rotm_(rb2.q');
             t = dlambda*n/dt^2;
             rb1.L = rb1.L + t*dt;
             rb2.L = rb2.L - t*dt;
@@ -167,9 +167,9 @@ classdef RigidBody < handle
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
-            rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*cross(r1,p)]',rb1.q')';
+            rb1.q = rb1.q + 0.5*quatmultiply_([0;I_inv1*cross(r1,p)]',rb1.q')';
             rb1.q = rb1.q / norm(rb1.q);
-            rb1.R = quat2rotm(rb1.q');
+            rb1.R = quat2rotm_(rb1.q');
             f = dlambda*n/dt^2;
             rb1.P = rb1.P + f*dt;
             rb1.L = rb1.L + cross(r1,f)*dt;
@@ -193,9 +193,9 @@ classdef RigidBody < handle
             dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde + eps);
             lambda = lambda + dlambda;
             p = dlambda*n;
-            rb1.q = rb1.q + 0.5*quatmultiply([0;I_inv1*p]',rb1.q')';
+            rb1.q = rb1.q + 0.5*quatmultiply_([0;I_inv1*p]',rb1.q')';
             rb1.q = rb1.q / norm(rb1.q);
-            rb1.R = quat2rotm(rb1.q');
+            rb1.R = quat2rotm_(rb1.q');
             t = dlambda*n/dt^2;
             rb1.L = rb1.L + t*dt;
             rb1.w = rb1.R * rb1.Ib_inv * rb1.R' * rb1.L;
@@ -220,12 +220,12 @@ classdef RigidBody < handle
 
         function ydot = getStatesDot(rb)
             q_ = rb.q / norm(rb.q);
-            R_ = quat2rotm(q_');
+            R_ = quat2rotm_(q_');
             v_ = rb.P / rb.m;
             w_ = R_ * rb.Ib_inv * R_' * rb.L;
             ydot = zeros(13,1);
             ydot( 1: 3) = v_;
-            ydot( 4: 7) = 0.5 * quatmultiply([0, w_'], q_')';
+            ydot( 4: 7) = 0.5 * quatmultiply_([0, w_'], q_')';
             ydot( 8:10) = rb.F;
             ydot(11:13) = rb.T;
         end
