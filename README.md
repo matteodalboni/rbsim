@@ -3,7 +3,10 @@ Rigid body simulation made simple.
 
 This is more like a proof-of-concept rather than a ready-to-use library. The rigid body modeling is based on [1], while the constraints are implemented according to the extended position-based dynamics method [2].
 <p align="center">
-  <img src="double_pendulum.gif" width="50%" />
+  <img src="double_pendulum1.gif" width="50%" />
+</p>
+<p align="center">
+  <img src="double_pendulum2.gif" width="50%" />
 </p>
 
 ## References
