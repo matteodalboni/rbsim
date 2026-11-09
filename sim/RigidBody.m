@@ -1,8 +1,8 @@
 classdef RigidBody < handle
     properties
         m = 0; % mass
-        Ib = zeros(3); % inertia tensor in the body frame
-        Ib_inv = zeros(3); % inverse of inertia tensor in the body frame
+        Ib = zeros(3); % centroidal inertia tensor in the body frame
+        Ib_inv = zeros(3); % inverse of the centroidal inertia tensor
         x = zeros(3,1); % position of the center of mass
         q = [1;0;0;0]; % rotation quaternion
         P = zeros(3,1); % linear momentum
