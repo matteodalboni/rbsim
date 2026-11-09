@@ -1,61 +1,68 @@
 classdef RigidBody < handle
     properties
-        m = 0 % mass
-        Ib = zeros(3) % inertia tensor in the body frame
-        Ib_inv = zeros(3) % inverse of inertia tensor in the body frame
-        x = zeros(3,1) % position of the center of mass
-        q = [1;0;0;0] % rotation quaternion
-        P = zeros(3,1) % linear momentum
-        L = zeros(3,1) % angular momentum
-        R = eye(3) % rotation matrix
-        v = zeros(3,1) % velocity of the center of mass
-        w = zeros(3,1) % angular velocity
-        F = zeros(3,1) % total force
-        T = zeros(3,1) % total torque
+        m = 0; % mass
+        Ib = zeros(3); % inertia tensor in the body frame
+        Ib_inv = zeros(3); % inverse of inertia tensor in the body frame
+        x = zeros(3,1); % position of the center of mass
+        q = [1;0;0;0]; % rotation quaternion
+        P = zeros(3,1); % linear momentum
+        L = zeros(3,1); % angular momentum
+        R = eye(3); % rotation matrix
+        v = zeros(3,1); % velocity of the center of mass
+        w = zeros(3,1); % angular velocity
+        F = zeros(3,1); % total force
+        T = zeros(3,1); % total torque
     end
 
     methods
         function rb = RigidBody(m, Ib)
+            % Rigid body constructor
             rb.m = m;
             rb.Ib = Ib;
             rb.Ib_inv = inv(Ib);
         end
 
         function setPosition(rb, x)
+            % Set the position of the center of mass.
             rb.x = x(:);
         end
 
         function setVelocity(rb, v)
+            % Set the velocity of the center of mass.
             rb.v = v(:);
             rb.P = rb.m*rb.v;
         end
 
         function setRotation(rb, alpha, direction)
+            % Set the body rotation.
             rb.q = [cos(0.5*alpha); sin(0.5*alpha)*direction(:)];
             rb.q = rb.q / norm(rb.q);
             rb.R = quat2rotm_(rb.q');
         end
 
-        function vq = getVelocity(rb, xq)
-            % Each column of xq is the position of one query point
-            vq = rb.v + cross(rb.w.*ones(size(xq)), xq - rb.x);
+        function va = getVelocity(rb, xa)
+            % Get the velocity of a specific point belonging to the rigid
+            % body. Each column of xa is the position of one query point.
+            % xa is expressed in the world reference frame.
+            va = rb.v + cross(rb.w.*ones(size(xa)), xa - rb.x);
         end
 
         function addTorque(rb, T)
-            % Each column of T is a torque vector
+            % Add torque. Each column of T is a torque vector.
             rb.T = rb.T + sum(T, 2);
         end
 
         function addForce(rb, F, xa)
-            % Each column of F is a force vector, each column of xa is the
-            % position of one point of application
+            % Add force at specific point. Each column of F is a force
+            % vector and the corresponding column of xa is is its point of
+            % application. xa is expressed in the world reference frame.
             r = xa - rb.x;
             rb.F = rb.F + sum(F, 2);
             rb.T = rb.T + sum(cross(r, F), 2);
         end
 
         function update(rb, dt)
-            % Time integration by fourth order Runge-Kutta method
+            % Time integrate using the fourth order Runge-Kutta method.
             y = rb.getStates();
             s1 = rb.getStatesDot();
             rb.setStates(y + dt*s1*0.5);
@@ -65,12 +72,12 @@ classdef RigidBody < handle
             rb.setStates(y + dt*s3);
             s4 = rb.getStatesDot();
             rb.setStates(y + dt*(s1 + 2*s2 + 2*s3 + s4)/6);
-            % Update of the auxiliary variables
+            % Update the auxiliary variables.
             rb.q = rb.q / norm(rb.q);
             rb.R = quat2rotm_(rb.q');
             rb.v = rb.P / rb.m;
             rb.w = rb.R * rb.Ib_inv * rb.R' * rb.L;
-            % Reset of forces and torques
+            % Reset the forces and the torques.
             rb.F = zeros(3,1);
             rb.T = zeros(3,1);
         end
