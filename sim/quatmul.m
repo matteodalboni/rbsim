@@ -1,4 +1,5 @@
-function s = quatmultiply_(q,r)
+function s = quatmul(q,r)
+    % Compute product of two quaternions
     q0 = q(1);
     q1 = q(2);
     q2 = q(3);

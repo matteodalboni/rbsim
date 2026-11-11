@@ -1,4 +1,5 @@
-function R = quat2rotm_(q)
+function R = quatrotm(q)
+    % Transform unit quaternion into rotation matrix
     q0 = q(1);
     q1 = q(2);
     q2 = q(3);
