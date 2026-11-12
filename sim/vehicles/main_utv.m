@@ -33,6 +33,8 @@ track_r_xl0 = track_xl0 - [0; body_size(2)/2 + wheel_r.width/2; 0];
 dt = 1e-3;
 t = 0:dt:12;
 hfig = figure;
+haxes = gca;
+hsurf = surf(X,Y,Z,'FaceColor','#C6A664','EdgeColor','w');
 set(hfig,'KeyPressFcn',@set_utv_input_by_key);
 setappdata(hfig, 'wl', 0);
 setappdata(hfig, 'wr', 0);
@@ -61,8 +63,8 @@ while 1
     rb.update(dt);
     % Animation
     if (~mod(k, 100))
-        clf;
-        draw_scene(rb, cont, body_size, F, x, n_layer_pts, X, Y, Z)
+        delete(setdiff(haxes.Children, hsurf));
+        draw_vehicle(rb, cont, body_size, F, x, n_layer_pts)
         view(getappdata(hfig, 'az'), getappdata(hfig, 'el'))
         title(sprintf("wl:%+5d rad/s | wr:%+5d rad/s",wheel_l.w,wheel_r.w))
         drawnow;

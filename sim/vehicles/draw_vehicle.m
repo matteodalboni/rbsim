@@ -1,4 +1,4 @@
-function draw_scene(rb, cont, body_size, F, x, stride, X, Y, Z)
+function draw_vehicle(rb, cont, body_size, F, x, stride)
     show_box(rb.x, rb.R, body_size); hold on
     plot3(x(1,:),x(2,:),x(3,:),'k.','MarkerSize',25)
     flt = 1:stride:size(x,2);
@@ -7,7 +7,6 @@ function draw_scene(rb, cont, body_size, F, x, stride, X, Y, Z)
     quiver3(rb.x(1),rb.x(2),rb.x(3),rb.R(1,2),rb.R(2,2),rb.R(3,2),'g','LineWidth',2)
     quiver3(rb.x(1),rb.x(2),rb.x(3),rb.R(1,3),rb.R(2,3),rb.R(3,3),'b','LineWidth',2)
     quiver3(cont.x0(1,:),cont.x0(2,:),cont.x0(3,:),F(1,:),F(2,:),F(3,:),'r','LineWidth',1.5)
-    surf(X,Y,Z,'FaceColor','#C6A664','EdgeColor','w')
 end
 
 function show_box(x, R, siz)
