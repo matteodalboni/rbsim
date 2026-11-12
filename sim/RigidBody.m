@@ -98,7 +98,7 @@ classdef RigidBody < handle
             w1 = 1/rb1.m + c1'*I_inv1*c1;
             w2 = 1/rb2.m + c2'*I_inv2*c2;
             alpha_tilde = alpha/dt^2;
-            dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde + eps);
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
@@ -136,7 +136,7 @@ classdef RigidBody < handle
             w1 = n'*I_inv1*n;
             w2 = n'*I_inv2*n;
             alpha_tilde = alpha/dt^2;
-            dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde + eps);
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + w2 + alpha_tilde);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.q = rb1.q + 0.5*quatmul([0;I_inv1*p]',rb1.q')';
@@ -164,7 +164,7 @@ classdef RigidBody < handle
             c1 = cross(r1,n);
             w1 = 1/rb1.m + c1'*I_inv1*c1;
             alpha_tilde = alpha/dt^2;
-            dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde + eps);
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.x = rb1.x + p/rb1.m;
@@ -191,7 +191,7 @@ classdef RigidBody < handle
             I_inv1 = rb1.R * rb1.Ib_inv * rb1.R';
             w1 = n'*I_inv1*n;
             alpha_tilde = alpha/dt^2;
-            dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde + eps);
+            dlambda = -(c + alpha_tilde*lambda)/(w1 + alpha_tilde);
             lambda = lambda + dlambda;
             p = dlambda*n;
             rb1.q = rb1.q + 0.5*quatmul([0;I_inv1*p]',rb1.q')';
