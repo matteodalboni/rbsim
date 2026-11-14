@@ -63,7 +63,7 @@ while 1
     rb.update(dt);
     % Animation
     if (~mod(k, 100))
-        delete(setdiff(haxes.Children, hsurf));
+        delete(setdiff(get(haxes, 'Children'), hsurf));
         draw_vehicle(rb, cont, body_size, F, x, n_layer_pts)
         view(getappdata(hfig, 'az'), getappdata(hfig, 'el'))
         title(sprintf("wl:%+5d rad/s | wr:%+5d rad/s",wheel_l.w,wheel_r.w))

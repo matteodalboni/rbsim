@@ -12,28 +12,28 @@ function set_utv_input_by_key(hfig, event)
     el = getappdata(hfig, 'el');
     alpha = getappdata(hfig, 'alpha');
     switch event.Key
-        case 'numpad5'
+        case {'numpad5','5'}
             wl = 0;
             wr = 0;
-        case 'numpad8'
+        case {'numpad8','8'}
             wl = wl + 1;
             wr = wr + 1;
-        case 'numpad2'
+        case {'numpad2','2'}
             wl = wl - 1;
             wr = wr - 1;
-        case 'numpad4'
+        case {'numpad4','4'}
             wl = wl - 1;
             wr = wr + 1;
-        case 'numpad6'
+        case {'numpad6','6'}
             wl = wl + 1;
             wr = wr - 1;
-        case 'uparrow'
+        case {'uparrow','up'}
             el = el + 5;
-        case 'downarrow'
+        case {'downarrow','down'}
             el = el - 5;
-        case 'leftarrow'
+        case {'leftarrow','left'}
             az = az + 5;
-        case 'rightarrow'
+        case {'rightarrow','right'}
             az = az - 5;
     end
     setappdata(hfig, 'wl', wl);
